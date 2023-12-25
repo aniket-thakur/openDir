@@ -1,0 +1,38 @@
+body{
+    background-color: thistle;
+}
+#container{
+    display: flex;
+    border : 1px solid blue;
+    padding: 10px;
+    margin-top: 10px;
+}
+.folders{
+    background-color:blanchedalmond;
+    border-radius: 8px;
+    height: 100px;
+    width: 100px; 
+   
+    margin: 5px;
+}
+.folders [action]{
+    text-decoration: underline;
+    padding: 5px;
+    cursor: pointer;
+}
+div[purpose ='name']{
+    margin-top: 40px;
+    margin-left: 5px;
+}
+#btn1{
+    padding: 15px;
+    width : 15%;
+    font-weight: bold;
+    border-radius: 20px;
+    background-color:darkgrey;
+    cursor : pointer;
+}
+#btn1:hover{
+    transform: scale(1.06);
+    background-color:rosybrown;
+}
