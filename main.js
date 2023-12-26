@@ -4,6 +4,10 @@
     let myTemplates = document.querySelector('#myTemplates');
     let fid = 0;
     let folders = [];  // to store the name and fid of every  folder
+    let folderJson = localStorage.getItem("data");
+    if(folderJson != null && folderJson.length > 0){
+        folders = JSON.parse(folderJson);
+    }
 
     btn.addEventListener('click', function(){
         let fname = prompt('Enter folder name:');
@@ -16,16 +20,20 @@
         divFolder.setAttribute("fid", ++fid);  // uniquer id for folders
         divName.innerHTML = fname;
         divContainer.appendChild(divFolder);
+        
         // delete a folder(Using closure )
         let delFolder = divFolder.querySelector("[action = 'del']");
         delFolder.addEventListener("click",function(){
             let flag = confirm(`${divName.innerHTML} will be removed!`);
             if(flag == true){   
-                divContainer.removeChild(divFolder); 
+                
                 let idx = folders.findIndex(f => f.id == parseInt(divFolder.getAttribute('fid')));
                 console.log(idx);
                 folders.splice(idx , 1);
                 console.log(folders);
+                persistFolder();
+                divContainer.removeChild(divFolder); 
+                
             }
             
         });
@@ -40,6 +48,7 @@
             let folder = folders.find(f => f.id == parseInt(divFolder.getAttribute('fid')));
             folder.name = fName2; // chage the edited name in the array also
             console.log(folders);
+            persistFolder();
         });
         divContainer.appendChild(divFolder);  // adding folder in the container
         folders.push({
@@ -47,7 +56,16 @@
             id : fid
         });
         console.log(folders);
+        persistFolder();   // preserve the data whenever a folder is created
     });
-    
+
+    function persistFolder(){
+        // console.log(folders);
+        let folderJson = JSON.stringify(folders);
+        localStorage.setItem("data", folderJson);
+    }
+
 })
 ();
+
+
