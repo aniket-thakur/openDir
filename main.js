@@ -15,15 +15,25 @@
         divFolder.setAttribute("fid", ++fid);  // uniquer id for folders
         divName.innerHTML = fname;
         divContainer.appendChild(divFolder);
-
+        // delete a folder(Using closure )
         let delFolder = divFolder.querySelector("[action = 'del']");
         delFolder.addEventListener("click",function(){
             let flag = confirm(`${fname} will be removed!`);
-            if(flag == true){
+            if(flag == true){    
                 divContainer.removeChild(divFolder);
             }
             
         });
+        // edit folder name (closure)
+        let editFolderName = divFolder.querySelector("[action='edit']");
+        editFolderName.addEventListener('click', function(){
+            let fName2 = prompt("Enter folder name");
+            if(!fName2){
+                return;
+            }
+            divName.innerHTML =fName2;
+        });
+        divContainer.appendChild(divFolder);
     });
     
 })
