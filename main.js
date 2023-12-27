@@ -5,7 +5,6 @@
     let fid = 0;
     let folders = [];  // to store the name and fid of every  folder
     
-        //add folder
     btn.addEventListener('click', function(){
         let fname = prompt('Enter folder name:');
         if(!fname){
@@ -22,6 +21,7 @@
     
     
     });
+    //add folder
     function addFolder(fname, fid){
         let divFolderTemplate = myTemplates.content.querySelector('.folders');
         let divFolder = document.importNode(divFolderTemplate, true);  // to create a copy of folders
@@ -38,6 +38,7 @@
         let editFolderName = divFolder.querySelector("[action='edit']");
         editFolderName.addEventListener('click', editFolder);
     }    
+    // delete folder
     function deleteFolder(){
         let divFolder = this.parentNode;
         let divName= divFolder.querySelector("[purpose = 'name']");
@@ -50,7 +51,8 @@
                 divContainer.removeChild(divFolder); 
                 persistFolderToStorage();   // preserve the data whenever a folder is created 
             }     
-    };    
+    }; 
+    //edit a folder   
     function editFolder(){
         let divFolder = this.parentNode;
         let divName= divFolder.querySelector("[purpose = 'name']");
