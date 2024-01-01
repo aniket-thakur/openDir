@@ -7,11 +7,30 @@ body{
     padding: 10px;
     margin-top: 10px;
 }
+.divBreadCrum{
+    display : flex;
+    border : 1px solid black;
+    padding : 10px;
+    margin-top : 10px;
+    margin-bottom: 10px;
+}
+.path{
+    border : 0.5px solid darkgreen;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.path:hover{
+    background-color: powderblue;
+    transform: scale(1.03);
+}
+
 .folders{
     background-color:blanchedalmond;
     border-radius: 8px;
     height: 100px;
-    width: 100px; 
+    width: 140px; 
    
     margin: 5px;
 }

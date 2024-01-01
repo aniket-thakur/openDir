@@ -2,52 +2,130 @@
     let btn = document.querySelector('#btn1');
     let divContainer= document.querySelector('#container');
     let myTemplates = document.querySelector('#myTemplates');
-    let fid = 0;
+    let myBreadcrum = document.querySelector('.divBreadCrum');
+    let fid = -1;    // folder id
+    let cfid = -1;   // current folder id in which we are
     let folders = [];  // to store the name and fid of every  folder
-
+    
     btn.addEventListener('click', function(){
         let fname = prompt('Enter folder name:');
-        if(!fname){
-            return;
+        fname = fname.trim();        // remove the spaces
+        if(!!fname){
+            let found = folders.filter(f => f.pid == cfid).some(f => f.name === fname); // return true if it found matching folder names
+            if(found == false){  // false means,it found no  matching fname, which means we are good to go  
+                ++fid;
+                addFolder(fname , fid, cfid);
+                folders.push({
+                    name : fname,
+                    id : fid,
+                    pid : cfid
+                });
+                console.log(folders);
+                persistFolderToStorage();
+            }
+            else{
+                alert(`${fname} already exists!!`);
+            }
         }
+        else{
+            alert("Folder name cannot be empty")
+        }
+    });
+    //add folder
+    function addFolder(fname, fid, cfid){
         let divFolderTemplate = myTemplates.content.querySelector('.folders');
         let divFolder = document.importNode(divFolderTemplate, true);  // to create a copy of folders
         let divName= divFolder.querySelector("[purpose = 'name']");
-        divFolder.setAttribute("fid", ++fid);  // uniquer id for folders
+        divFolder.setAttribute("fid", fid);  // unique id for folders   
+        divFolder.setAttribute("pid", cfid);   // pid => parent id
+
         divName.innerHTML = fname;
         divContainer.appendChild(divFolder);
-        // delete a folder(Using closure )
+
+        // delete a folder
         let delFolder = divFolder.querySelector("[action = 'del']");
-        delFolder.addEventListener("click",function(){
-            let flag = confirm(`${divName.innerHTML} will be removed!`);
-            if(flag == true){   
-                divContainer.removeChild(divFolder); 
-                let idx = folders.findIndex(f => f.id == parseInt(divFolder.getAttribute('fid')));
+        delFolder.addEventListener("click",deleteFolder);
+        
+        // edit folder name (closure)
+        let editFolderName = divFolder.querySelector("[action='edit']");
+        editFolderName.addEventListener('click', editFolder);
+
+        // view folder
+        let vFolder = divFolder.querySelector("[action='view']");
+        vFolder.addEventListener("click", viewFolder);
+    }   
+    // View folder function
+    function viewFolder(){
+        let divFolder =  this.parentNode;
+        let divName = divFolder.querySelector("[action='view']");
+        cfid = parseInt(divFolder.getAttribute('fid'));  // this will be out parent folder
+        divContainer.innerHTML = '';
+        folders.filter(f => f.pid == cfid).forEach(f => {
+            addFolder(f.name, f.id, f.pid)
+        })
+    };
+    // delete folder
+    function deleteFolder(){
+        let divFolder = this.parentNode;
+        let divName= divFolder.querySelector("[purpose = 'name']");
+        let flag = confirm(`${divName.innerHTML} will be removed!`);
+            if(flag == true){
+                let fid = parseInt(divFolder.getAttribute('fid'))   
+                let idx = folders.filter(f => f.pid == cfid).findIndex(f => f.id == fid);
                 console.log(idx);
                 folders.splice(idx , 1);
                 console.log(folders);
+                divContainer.removeChild(divFolder); 
+                persistFolderToStorage();   // preserve the data whenever a folder is created 
+            }     
+    }; 
+    //edit a folder   
+    function editFolder(){
+        let divFolder = this.parentNode;
+        let divName= divFolder.querySelector("[purpose = 'name']");
+        let fName2 = prompt("Enter folder name");
+        fName2 = fName2.trim();   
+            if(!!fName2){
+                let found = folders.filter(f=> f.pid == cfid).some(f => f.name === fName2);
+                if(found == false){
+                    divName.innerHTML = fName2;
+                    let fid = parseInt(divFolder.getAttribute('fid'))
+                    let folder = folders.filter(f => f.pid == cfid).find(f => f.id == fid);
+                    folder.name = fName2; // chage the edited name in the array also
+                    console.log(folders);
+                    persistFolderToStorage();   // preserve the data whenever a folder is created
+                }
+                else{
+                    alert(`${fName2} already exists!!`);
+                }
             }
-            
-        });
-        // edit folder name (closure)
-        let editFolderName = divFolder.querySelector("[action='edit']");
-        editFolderName.addEventListener('click', function(){
-            let fName2 = prompt("Enter folder name");
-            if(!fName2){
-                return;
+            else{
+                alert('Folder name cannot be empty');
             }
-            divName.innerHTML = fName2;
-            let folder = folders.find(f => f.id == parseInt(divFolder.getAttribute('fid')));
-            folder.name = fName2; // chage the edited name in the array also
-            console.log(folders);
-        });
-        divContainer.appendChild(divFolder);  // adding folder in the container
-        folders.push({
-            name : fname,
-            id : fid
-        });
-        console.log(folders);
-    });
-    
+    };
+
+    function persistFolderToStorage(){
+        // console.log(folders);
+        let folderJson = JSON.stringify(folders);
+        localStorage.setItem("data", folderJson);
+    };
+    function loadFolderFromStorage(){
+        let fJson = localStorage.getItem("data");
+        if(!!fJson){
+        folders = JSON.parse(fJson);
+        let maxId = -1; 
+        folders.forEach(f =>{
+            if(f.pid == cfid){
+                addFolder(f.name, f.id);
+            }
+            if(maxId < f.id){     // so that when we refresh the page, the fid should not start from 1 and start
+                maxId = f.id;   // from the last maxId
+            }
+         });
+         fid = maxId;
+    }
+    }
+    loadFolderFromStorage();
+
 })
 ();
