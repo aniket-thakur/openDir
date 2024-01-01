@@ -3,10 +3,11 @@
     let divContainer= document.querySelector('#container');
     let myTemplates = document.querySelector('#myTemplates');
     let myBreadcrum = document.querySelector('.divBreadCrum');
+    let navPath = document.querySelector('.path');
     let fid = -1;    // folder id
     let cfid = -1;   // current folder id in which we are
     let folders = [];  // to store the name and fid of every  folder
-    
+  
     btn.addEventListener('click', function(){
         let fname = prompt('Enter folder name:');
         fname = fname.trim();        // remove the spaces
@@ -54,15 +55,43 @@
         let vFolder = divFolder.querySelector("[action='view']");
         vFolder.addEventListener("click", viewFolder);
     }   
+
+    // breadcrum navigation
+    navPath.addEventListener('click',breadcrumNav);
+    function breadcrumNav(){
+        // let name = this.innerHTML;
+        let cfid = this.getAttribute("fid");  // cfid is the folder parent id
+        divContainer.innerHTML = ""
+        folders.filter(f => f.pid == cfid).forEach(f => {
+            addFolder(f.name, f.id, f.pid)
+        })
+        // to remove the next thing in breadcrumb if the previous one is selected 
+        //like if path is root -> a -> b -> c
+        // and a is clicked in breadcrum then the 'b' and 'c' should be removed, that is what the 
+        // while loop is doing 
+        while(this.nextSibling){
+            this.parentNode.removeChild(this.nextSibling);
+        }
+
+        
+    }
     // View folder function
     function viewFolder(){
+        let aDivTemplate = myTemplates.content.querySelector('.path');
+        let aPath = document.importNode(aDivTemplate,true);
         let divFolder =  this.parentNode;
-        let divName = divFolder.querySelector("[action='view']");
-        cfid = parseInt(divFolder.getAttribute('fid'));  // this will be out parent folder
+        let divName = divFolder.querySelector("[purpose='name']");
+        cfid = parseInt(divFolder.getAttribute('fid'));  // this will be our parent folder
         divContainer.innerHTML = '';
         folders.filter(f => f.pid == cfid).forEach(f => {
             addFolder(f.name, f.id, f.pid)
         })
+        aPath.innerHTML = divName.innerHTML;
+        aPath.setAttribute('fid',cfid);
+
+        myBreadcrum.appendChild(aPath);
+        aPath.addEventListener('click',breadcrumNav);
+
     };
     // delete folder
     function deleteFolder(){
