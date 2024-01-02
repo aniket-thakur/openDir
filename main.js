@@ -82,12 +82,13 @@
         let divFolder =  this.parentNode;
         let divName = divFolder.querySelector("[purpose='name']");
         cfid = parseInt(divFolder.getAttribute('fid'));  // this will be our parent folder
+        aPath.setAttribute('fid',cfid);
         divContainer.innerHTML = '';
         folders.filter(f => f.pid == cfid).forEach(f => {
             addFolder(f.name, f.id, f.pid)
         })
         aPath.innerHTML = divName.innerHTML;
-        aPath.setAttribute('fid',cfid);
+        // aPath.setAttribute('fid',cfid);
 
         myBreadcrum.appendChild(aPath);
         aPath.addEventListener('click',breadcrumNav);
@@ -99,13 +100,18 @@
         let divName= divFolder.querySelector("[purpose = 'name']");
         let flag = confirm(`${divName.innerHTML} will be removed!`);
             if(flag == true){
-                let fid = parseInt(divFolder.getAttribute('fid'))   
-                let idx = folders.filter(f => f.pid == cfid).findIndex(f => f.id == fid);
-                console.log(idx);
-                folders.splice(idx , 1);
-                console.log(folders);
-                divContainer.removeChild(divFolder); 
-                persistFolderToStorage();   // preserve the data whenever a folder is created 
+                let fid = parseInt(divFolder.getAttribute('fid'))  
+                let exists= folders.some(f => f.pid == fid)
+                if(exists == false){
+                    let idx = folders.findIndex(f => f.id == fid);
+                    folders.splice(idx , 1);
+                    divContainer.removeChild(divFolder); 
+                    persistFolderToStorage();   // preserve the data whenever a folder is created 
+                }
+                else{
+                    alert("folder contains folder");
+                }
+                
             }     
     }; 
     //edit a folder   
